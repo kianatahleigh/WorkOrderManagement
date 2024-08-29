@@ -39,6 +39,7 @@ public class WorkOrderSystem {
             WorkOrderDAO workOrderDAO = new WorkOrderDAO(); // Instantiate WorkOrderDAO
             workOrderDAO.setConnection(connection); // Set connection
 
+
             int tenantID = workOrderDAO.addTenant(name, phoneNumber, address);
 
             String ticketNumber = assignTicketNumber();
@@ -51,7 +52,7 @@ public class WorkOrderSystem {
 
             // Create a new WorkOrder with the generated tenantID and ticket number
             WorkOrder workOrder = new WorkOrder(
-                    1, // Tenant ID to be set after insertion
+                    tenantID, // Tenant ID to be set after insertion
                     name,
                     phoneNumber,
                     address,
@@ -310,7 +311,7 @@ public class WorkOrderSystem {
 
                     // Update the status in the database and catch any SQLExceptions
                     try {
-                        workOrderDAO.updateWorkOrderStatus(workOrder.getTicketNumber(), newStatus);
+                        workOrderDAO.updateWorkOrderStatus(workOrder.getTicketNumber(), newStatus, adminID);
 
                         // Update the status in the WorkOrder object
                         workOrder.setStatus(newStatus);

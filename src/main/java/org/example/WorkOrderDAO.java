@@ -18,7 +18,7 @@ public class WorkOrderDAO {
     public void createWorkOrder(WorkOrder workOrder) throws SQLException {
         String ticketNumber = workOrder.getTicketNumber(); // Get the generated ticket number (should be set beforehand)
 
-        String query = "INSERT INTO WorkOrders (tenant_id, submission_date, conditions, priority_level, ticket_id, status, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO WorkOrders (tenant_id, submission_date, conditions, priority_level, ticket_number, status, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, workOrder.getTenantID());
             statement.setDate(2, java.sql.Date.valueOf(workOrder.getSubmissionDate())); // Convert LocalDate to SQL Date
@@ -36,7 +36,7 @@ public class WorkOrderDAO {
 
     // Method to retrieve a work order by ticket number
     public WorkOrder getWorkOrder(String ticketNumber) throws SQLException {
-        String query = "SELECT * FROM WorkOrders JOIN Tenants ON WorkOrders.tenant_id = Tenants.tenant_id WHERE ticket_id = ?";
+        String query = "SELECT * FROM WorkOrders JOIN Tenants ON WorkOrders.tenant_id = Tenants.tenant_id WHERE ticket_number = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setString(1, ticketNumber);
         ResultSet resultSet = statement.executeQuery();
@@ -48,7 +48,7 @@ public class WorkOrderDAO {
             LocalDate submissionDate = resultSet.getDate("submission_date").toLocalDate();
             String conditions = resultSet.getString("conditions");
             String priorityLevel = resultSet.getString("priority_level");
-            String ticketID = resultSet.getString("ticket_id");
+            String ticketID = resultSet.getString("ticket_number");
             int adminID = resultSet.getInt("admin_id");
             String statusStr = resultSet.getString("status");
             WorkOrder.Status status = WorkOrder.Status.valueOf(statusStr.toUpperCase());
@@ -97,18 +97,19 @@ public class WorkOrderDAO {
     }
 
 
-    public void updateWorkOrderStatus(String ticketNumber, WorkOrder.Status newStatus) throws SQLException {
-        String updateQuery = "UPDATE workorders SET status = ? WHERE `ticket_id` = ?";
+    public void updateWorkOrderStatus(String ticketNumber, WorkOrder.Status newStatus, int adminID) throws SQLException {
+        String updateQuery = "UPDATE workorders SET status = ?, admin_id = ? WHERE ticket_number = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
             preparedStatement.setString(1, newStatus.name());
-            preparedStatement.setString(2, ticketNumber);
+            preparedStatement .setInt(2, adminID);  // Set the adminID
+            preparedStatement.setString(3, ticketNumber);
             preparedStatement.executeUpdate();
         }
     }
 
 
     public boolean deleteWorkOrder(String ticketNumber) throws SQLException {
-        String deleteQuery = "DELETE FROM workorders WHERE ticket_id = ?";
+        String deleteQuery = "DELETE FROM workorders WHERE ticket_number = ?";
         try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
             stmt.setString(1, ticketNumber);
             int rowsAffected = stmt.executeUpdate();

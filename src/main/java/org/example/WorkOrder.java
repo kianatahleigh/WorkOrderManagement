@@ -129,7 +129,7 @@ public class WorkOrder {
     public void setStatus(Status newStatus) throws SQLException {
         this.status = newStatus;
         // Call DAO method to update database
-        workOrderDAO.updateWorkOrderStatus(this.ticketNumber, newStatus);
+        workOrderDAO.updateWorkOrderStatus(this.ticketNumber, newStatus, this.adminID);
     }
 
 
