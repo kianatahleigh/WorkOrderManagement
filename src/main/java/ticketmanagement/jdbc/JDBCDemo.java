@@ -8,8 +8,8 @@ public class JDBCDemo {
 
 
         String url="jdbc:mysql://localhost:3306/workordermanagementsystemdb";
-        String user="root";
-        String password="password";
+        String user="x";
+        String password="x";
 
         try{ Class.forName("com.mysql.cj.jdbc.Driver");
 

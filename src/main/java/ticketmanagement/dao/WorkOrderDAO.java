@@ -16,25 +16,25 @@ public class WorkOrderDAO {
 
     // Method to create a work order
     public void createWorkOrder(WorkOrder workOrder) throws SQLException {
-        String ticketNumber = workOrder.getTicketNumber(); // Get the generated ticket number (should be set beforehand)
+        String ticketNumber = workOrder.getTicketNumber();
 
         String query = "INSERT INTO WorkOrders (tenant_id, submission_date, conditions, priority_level, ticket_number, status, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, workOrder.getTenantID());
-            statement.setDate(2, java.sql.Date.valueOf(workOrder.getSubmissionDate())); // Convert LocalDate to SQL Date
+            statement.setDate(2, java.sql.Date.valueOf(workOrder.getSubmissionDate()));
             statement.setString(3, workOrder.getConditions());
             statement.setString(4, workOrder.getPriorityLevel());
             statement.setString(5, ticketNumber);
-            statement.setString(6, workOrder.getStatus().name()); // Convert Status enum to String
-            statement.setInt(7, workOrder.getAdminID()); // Ensure admin_id is handled
+            statement.setString(6, workOrder.getStatus().name());
+            statement.setInt(7, workOrder.getAdminID());
             statement.executeUpdate();
         } catch (SQLIntegrityConstraintViolationException e) {
-            // Handle duplicate ticket number error
+
             throw new SQLException("Duplicate entry for ticket number: " + ticketNumber);
         }
     }
 
-    // Method to retrieve a work order by ticket number
+
     public WorkOrder getWorkOrder(String ticketNumber) throws SQLException {
         String query = "SELECT * FROM WorkOrders JOIN Tenants ON WorkOrders.tenant_id = Tenants.tenant_id WHERE ticket_number = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -53,10 +53,10 @@ public class WorkOrderDAO {
             String statusStr = resultSet.getString("status");
             WorkOrder.Status status = WorkOrder.Status.valueOf(statusStr.toUpperCase());
 
-            WorkOrderDAO workOrderDAO = new WorkOrderDAO(); // Initialize WorkOrderDAO
-            workOrderDAO.setConnection(connection); // Set connection
+            WorkOrderDAO workOrderDAO = new WorkOrderDAO();
+            workOrderDAO.setConnection(connection);
 
-            // Create and return the WorkOrder object
+
             return new WorkOrder(
                     tenantID,
                     name,
@@ -64,20 +64,20 @@ public class WorkOrderDAO {
                     address,
                     submissionDate,
                     conditions,
-                    0, // priorityScore not retrieved, you may need to calculate or retrieve it separately
+                    0,
                     priorityLevel,
                     ticketID,
                     status,
                     adminID,
-                    null,// Admin name can be queried separately if needed
+                    null,
                     workOrderDAO
             );
         } else {
-            return null; // Or throw an exception if not found
+            return null;
         }
     }
 
-    // Method to add an admin to the database and return the generated admin_id
+
     public int addAdmin(String adminName) throws SQLException {
         String query = "INSERT INTO Admins (admin_name) VALUES (?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -85,7 +85,7 @@ public class WorkOrderDAO {
                     adminName);
             statement.executeUpdate();
 
-            // Retrieve the generated admin ID
+
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1);
@@ -101,7 +101,7 @@ public class WorkOrderDAO {
         String updateQuery = "UPDATE workorders SET status = ?, admin_id = ? WHERE ticket_number = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
             preparedStatement.setString(1, newStatus.name());
-            preparedStatement .setInt(2, adminID);  // Set the adminID
+            preparedStatement .setInt(2, adminID);
             preparedStatement.setString(3, ticketNumber);
             preparedStatement.executeUpdate();
         }
@@ -113,7 +113,7 @@ public class WorkOrderDAO {
         try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
             stmt.setString(1, ticketNumber);
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Return true if deletion was successful
+            return rowsAffected > 0;
         }
     }
 

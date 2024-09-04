@@ -17,15 +17,15 @@ public class WorkOrderSystem {
     }
 
     private PriorityQueue<WorkOrder> workOrderQueue;
-    private Map<String, WorkOrder> workOrderMap; // This is to track work orders by ticket number
-    private int ticketCounter = 1; // This is to assign unique ticket numbers
+    private Map<String, WorkOrder> workOrderMap;
+    private int ticketCounter = 1;
     private WorkOrderDAO workOrderDAO;
 
     public WorkOrderSystem() {
-        // Initialize the DAO with a database connection
+
         this.workOrderDAO = new WorkOrderDAO();
 
-        // Order by descending priority score, and by submission date if scores are equal (older first)
+
         workOrderQueue = new PriorityQueue<>((o1, o2) -> {
             int scoreComparison = o2.getPriorityScore() - o1.getPriorityScore();
             if (scoreComparison == 0) {
@@ -33,14 +33,14 @@ public class WorkOrderSystem {
             }
             return scoreComparison;
         });
-        workOrderMap = new HashMap<>(); // Initializes the map
+        workOrderMap = new HashMap<>();
     }
 
     public void addWorkOrder(String name, String phoneNumber, String address, LocalDate submissionDate, String conditions) throws SQLException {
-        // Create tenant and work order in the database
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "root", "password")) {
-            WorkOrderDAO workOrderDAO = new WorkOrderDAO(); // Instantiate WorkOrderDAO
-            workOrderDAO.setConnection(connection); // Set connection
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "x", "x")) {
+            WorkOrderDAO workOrderDAO = new WorkOrderDAO();
+            workOrderDAO.setConnection(connection);
 
 
             int tenantID = workOrderDAO.addTenant(name, phoneNumber, address);
@@ -53,9 +53,9 @@ public class WorkOrderSystem {
             String determinedPriority = determinePriority(priorityScore);
 
 
-            // Create a new WorkOrder with the generated tenantID and ticket number
+
             WorkOrder workOrder = new WorkOrder(
-                    tenantID, // Tenant ID to be set after insertion
+                    tenantID,
                     name,
                     phoneNumber,
                     address,
@@ -68,28 +68,28 @@ public class WorkOrderSystem {
                     0,
                     "",
                     this.workOrderDAO
-                    // Initial status is NEW
+
             );
 
-            // Create tenant and work order
+
             workOrderDAO.createWorkOrder(workOrder);
 
-            // Add the work order to the queue
+
             workOrderQueue.add(workOrder);
-            workOrderMap.put(ticketNumber, workOrder); // Update map with the new work order
+            workOrderMap.put(ticketNumber, workOrder);
         }
     }
 
     public WorkOrder getNextWorkOrder() {
-        WorkOrder nextWorkOrder = workOrderQueue.poll(); // This is to retrieve and remove the highest-priority work order
+        WorkOrder nextWorkOrder = workOrderQueue.poll();
         if (nextWorkOrder != null) {
-            workOrderMap.put(nextWorkOrder.getTicketNumber(), nextWorkOrder); // this is to add to map for tracking
+            workOrderMap.put(nextWorkOrder.getTicketNumber(), nextWorkOrder);
         }
         return nextWorkOrder;
     }
 
     public WorkOrder getWorkOrderByTicketNumber(String ticketNumber) throws SQLException {
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "root", "password")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "x", "x")) {
             workOrderDAO.setConnection(connection);
             return workOrderDAO.getWorkOrder(ticketNumber);
         }
@@ -216,18 +216,18 @@ public class WorkOrderSystem {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a number corresponding to a condition.");
-                scanner.nextLine(); // Clear invalid input
+                scanner.nextLine();
             }
         }
 
-        // Adds work order based on user input
+
         try {
             calculator.addWorkOrder(name, phoneNumber, address, submissionDate, conditions);
         } catch (SQLException e) {
             System.out.println("Failed to add work order: " + e.getMessage());
         }
 
-        // This gets and displays the work order details
+
         WorkOrder nextWorkOrder = calculator.getNextWorkOrder();
         if (nextWorkOrder != null) {
             System.out.println("Work Order Details:");
@@ -248,12 +248,12 @@ public class WorkOrderSystem {
 
         Connection connection = null;
         try {
-            // Initialize the connection
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "root", "password");
-            WorkOrderDAO workOrderDAO = calculator.getWorkOrderDAO();
-            workOrderDAO.setConnection(connection); // Set the connection
 
-            int adminID = workOrderDAO.addAdmin(adminName); // Add admin and get ID
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/workordermanagementsystemdb", "x", "x");
+            WorkOrderDAO workOrderDAO = calculator.getWorkOrderDAO();
+            workOrderDAO.setConnection(connection);
+
+            int adminID = workOrderDAO.addAdmin(adminName);
             System.out.println("Admin ID generated: " + adminID);
 
             System.out.println("Please enter the ticket number of the work order you'd like to view:");
@@ -275,10 +275,10 @@ public class WorkOrderSystem {
                 System.out.println("2. Delete Work Order");
 
                 int adminChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine();
 
                 if (adminChoice == 1) {
-                    // Change the status of the work order
+
                     System.out.println("\nChange the status of this work order:");
                     System.out.println("1. IN PROGRESS");
                     System.out.println("2. COMPLETED");
@@ -289,7 +289,7 @@ public class WorkOrderSystem {
                     while (newStatus == null) {
                         try {
                             int statusChoice = scanner.nextInt();
-                            scanner.nextLine(); // Consume newline
+                            scanner.nextLine();
                             switch (statusChoice) {
                                 case 1:
                                     newStatus = WorkOrder.Status.IN_PROGRESS;
@@ -308,15 +308,15 @@ public class WorkOrderSystem {
                             }
                         } catch (InputMismatchException e) {
                             System.out.println("Invalid input. Please enter a number corresponding to a status.");
-                            scanner.nextLine(); // Clear invalid input
+                            scanner.nextLine();
                         }
                     }
 
-                    // Update the status in the database and catch any SQLExceptions
+
                     try {
                         workOrderDAO.updateWorkOrderStatus(workOrder.getTicketNumber(), newStatus, adminID);
 
-                        // Update the status in the WorkOrder object
+
                         workOrder.setStatus(newStatus);
                         System.out.println("Work Order status has been updated to: " + workOrder.getStatus());
                     } catch (SQLException e) {
@@ -324,7 +324,7 @@ public class WorkOrderSystem {
                     }
 
                 } else if (adminChoice == 2) {
-                    // Delete the work order
+
                     System.out.println("Are you sure you want to delete this work order? (yes/no)");
                     String confirmation = scanner.nextLine().trim().toLowerCase();
                     if ("yes".equals(confirmation)) {
@@ -346,7 +346,7 @@ public class WorkOrderSystem {
         } catch (SQLException e) {
             System.out.println("Failed to connect to the database: " + e.getMessage());
         } finally {
-            // Close the connection in the finally block
+
             if (connection != null) {
                 try {
                     connection.close();
