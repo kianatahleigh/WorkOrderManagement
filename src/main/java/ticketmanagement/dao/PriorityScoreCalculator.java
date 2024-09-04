@@ -1,7 +1,5 @@
-package org.example;
+package ticketmanagement.dao;
 
-
-import java.time.LocalDate;
 
 public class PriorityScoreCalculator {
 

@@ -1,4 +1,4 @@
-package org.example;
+package ticketmanagement.dao;
 
 public class ConditionScoreCalculator {
 

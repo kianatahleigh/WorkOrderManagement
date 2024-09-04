@@ -1,9 +1,9 @@
-package org.example;
+package ticketmanagement.dao;
+
+import ticketmanagement.model.WorkOrder;
 
 import java.time.LocalDate;
 import java.sql.*;
-import java.sql.DriverManager;
-
 
 
 public class WorkOrderDAO {

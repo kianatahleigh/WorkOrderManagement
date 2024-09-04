@@ -1,4 +1,4 @@
-package org.example;
+package ticketmanagement.dao;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

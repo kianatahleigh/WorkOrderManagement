@@ -1,6 +1,7 @@
-package org.example;
+package ticketmanagement.model;
 
-import org.example.WorkOrderDAO;
+import ticketmanagement.dao.WorkOrderDAO;
+
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -14,7 +15,7 @@ public class WorkOrder {
     private int priorityScore;
     private String priorityLevel;
     private String ticketNumber;
-    private Status status;
+    public Status status;
     private int adminID;
     private String adminName;
     private WorkOrderDAO workOrderDAO;
@@ -35,7 +36,7 @@ public class WorkOrder {
         this.workOrderDAO = workOrderDAO;
     }
 
-    enum Status {
+    public enum Status {
         NEW, IN_PROGRESS, COMPLETED, CLOSED, CANCELLED
     }
 

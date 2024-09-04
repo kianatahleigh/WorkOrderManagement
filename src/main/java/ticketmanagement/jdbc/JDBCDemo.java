@@ -1,5 +1,4 @@
-package org.example;
-import java.sql.*;
+package ticketmanagement.jdbc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
