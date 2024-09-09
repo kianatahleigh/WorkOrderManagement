@@ -145,16 +145,16 @@ public class WorkOrderSystem {
         WorkOrderSystem calculator = new WorkOrderSystem();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Are you a tenant or an admin? (Enter 'tenant' or 'admin')");
-        String userType = scanner.nextLine().trim().toLowerCase();
+        System.out.println("Are you a tenant or an admin? \nEnter:\n 1). tenant\n 2). admin\n 3). exit");
+        String userType = scanner.nextLine();
 
-        if ("tenant".equals(userType)) {
-            runTenantSection(scanner, calculator);
-        } else if ("admin".equals(userType)) {
-            runAdminSection(scanner, calculator);
-        } else {
-            System.out.println("Invalid user type. Please restart the program and enter either 'tenant' or 'admin'.");
-        }
+		switch (userType) {
+			case "1" -> runTenantSection(scanner, calculator);
+			case "2" -> runAdminSection(scanner, calculator);
+			case "3" -> System.out.println("Exiting the program. Goodbye!");
+			default ->
+				System.out.println("Invalid user type. Please restart the program and enter either 'tenant' or 'admin'.");
+		}
 
         scanner.close();
     }
